@@ -3,15 +3,17 @@
  * Handles streaming completions and API key resolution
  */
 
-// Default AI model
-export const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
+// Default AI model (active and verified on Groq API)
+export const DEFAULT_MODEL = 'openai/gpt-oss-120b';
 
 // Available models that users can choose from in Settings
 export const AVAILABLE_MODELS = [
-  { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B (Fast & Versatile)' },
-  { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B (Super Fast)' },
-  { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B (32k context)' },
-  { id: 'gemma2-9b-it', name: 'Gemma 2 9B (Google lightweight)' },
+  { id: 'openai/gpt-oss-120b', name: 'GPT OSS 120B (Powerful & Smart)' },
+  { id: 'openai/gpt-oss-20b', name: 'GPT OSS 20B (Ultra Fast)' },
+  { id: 'qwen/qwen3.8-27b', name: 'Qwen 3.8 27B' },
+  { id: 'allam-2-7b', name: 'ALLaM 2 7B' },
+  { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B' },
+  { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B' },
 ];
 
 // System prompt defining Light's personality
@@ -37,7 +39,12 @@ export function getApiKey() {
  * Retrieves the currently selected model from localStorage or defaults
  */
 export function getSelectedModel() {
-  return localStorage.getItem('groq_model') || DEFAULT_MODEL;
+  const saved = localStorage.getItem('groq_model');
+  // If no model saved or user was on the unavailable model, switch to the new active default
+  if (!saved || saved === 'llama-3.3-70b-versatile') {
+    return DEFAULT_MODEL;
+  }
+  return saved;
 }
 
 /**
