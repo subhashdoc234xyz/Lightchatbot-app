@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ChatWindow from './components/ChatWindow';
 import ChatInput from './components/ChatInput';
 import SettingsModal from './components/SettingsModal';
-import { streamChatCompletion } from './services/groq';
+import { streamChatCompletion, getSelectedModel, AVAILABLE_MODELS } from './services/groq';
 
 const STORAGE_KEY = 'light_chat_history';
 
@@ -18,7 +18,15 @@ export default function App() {
 
   const [isStreaming, setIsStreaming] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [modelUpdateTrigger, setModelUpdateTrigger] = useState(0);
   const abortControllerRef = useRef(null);
+
+  // Get active model display name
+  const currentModelId = getSelectedModel();
+  const currentModelObj = AVAILABLE_MODELS.find((m) => m.id === currentModelId);
+  const currentModelName = currentModelObj
+    ? currentModelObj.name.split(' (')[0]
+    : 'GPT OSS 120B';
 
   // Sync messages to localStorage whenever they update
   useEffect(() => {
@@ -114,13 +122,15 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden select-text">
+    <div className="flex flex-col h-screen w-screen ambient-bg text-slate-100 overflow-hidden select-text">
       {/* Main Chat Interface */}
       <ChatWindow
         messages={messages}
         isStreaming={isStreaming}
         onNewChat={handleNewChat}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onSelectPrompt={handleSendMessage}
+        currentModelName={currentModelName}
       />
 
       {/* Message Input Box */}
@@ -134,6 +144,7 @@ export default function App() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+        onSave={() => setModelUpdateTrigger((c) => c + 1)}
       />
     </div>
   );
