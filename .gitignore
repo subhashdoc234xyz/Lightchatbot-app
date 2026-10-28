@@ -9,8 +9,10 @@ release/
 
 # Environment variables (API keys!)
 .env
+.env*
 .env.local
 .env.*.local
+.env.backup
 
 # Logs
 *.log
